@@ -1,0 +1,22 @@
+{
+  "name": "@shaffuru/validation",
+  "version": "1.0.0",
+  "description": "Validation for Shaffuru's chain of command (from conductor to musician)",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/immjs/shaffuru.git"
+  },
+  "author": "Juliet WANG <immjs>",
+  "license": "Hippocratic-2.1",
+  "bugs": {
+    "url": "https://github.com/immjs/shaffuru/issues"
+  },
+  "homepage": "https://github.com/immjs/shaffuru#readme",
+  "dependencies": {
+    "zod": "^3.23.8"
+  }
+}
