@@ -1,7 +1,7 @@
 {
-  "name": "@shaffuru/player",
+  "name": "@shaffuru/musician",
   "version": "1.0.0",
-  "description": "Player for Shaffuru",
+  "description": "Musician for Shaffuru",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
