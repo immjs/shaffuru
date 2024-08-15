@@ -30,7 +30,6 @@ export class Musician {
       return v.upnp ?? this.config.config.upnp;
     }).bind(this))) {
       this.upnpClient = createUpnpClient({ interface: config.config.iface });
-      console.log('aaa', this.upnpClient);
       this.upnpClient.then((v) => console.log(v))
     }
 

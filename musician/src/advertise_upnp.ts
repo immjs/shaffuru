@@ -14,7 +14,6 @@ export class UPNPAdvertiser {
 
   constructor (options: UPNPAdvertiserOpts, client: Promise<UpnpClient>) {
     this.options = options;
-    console.log(client);
     this.client = client;
   }
 

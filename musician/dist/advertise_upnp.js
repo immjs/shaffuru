@@ -2,7 +2,6 @@ export class UPNPAdvertiser {
     constructor(options, client) {
         this.isUp = false;
         this.options = options;
-        console.log(client);
         this.client = client;
     }
     async start() {

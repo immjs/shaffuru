@@ -15,7 +15,6 @@ export class WebhookNotifier extends BaseNotifier<'webhook'> {
   }
 
   async notify(events: Notification[]) {
-    console.log(Handlebars.compile(this.config.data, { noEscape: true })({ events }));
     await fetch(this.config.url, this.config.data
       ? ({
         body: Handlebars.compile(this.config.data, { noEscape: true })({ events }),
