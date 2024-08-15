@@ -47,6 +47,8 @@ export const configSchema = z.object({
             .default(true),
         conductor: z.string().regex(/^wss?:\/\/.+(\:.+)$/)
             .optional(),
+        iface: z.string()
+            .optional(),
     })
         .default({}),
     trusted_keys: z.array(z.object({

@@ -2,7 +2,8 @@ import cron from 'node-cron';
 import crypto from 'crypto';
 import { TCPMirror } from './tcpmirror.js';
 import { WebhookNotifier } from './notify/webhook.js';
-import { createUpnpClient } from '@xmcl/nat-api';
+// import { EmailNotifier } from './notify/email.js';
+import { createUpnpClient } from '@immjs/nat-api';
 const allNotifiers = {
     webhook: WebhookNotifier,
     email: undefined,
@@ -16,7 +17,7 @@ export class Musician {
         if (this.config.services.some((function (v) {
             return v.upnp ?? this.config.config.upnp;
         }).bind(this))) {
-            this.upnpClient = createUpnpClient();
+            this.upnpClient = createUpnpClient({ interface: config.config.iface });
             console.log('aaa', this.upnpClient);
             this.upnpClient.then((v) => console.log(v));
         }

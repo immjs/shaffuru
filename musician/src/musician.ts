@@ -6,8 +6,8 @@ import { configSchema, notifyConfigSchema, serviceConfigSchema } from './config.
 import { TCPMirror } from './tcpmirror.js';
 import { BaseNotifier, Notification } from './notify/base_notifier.js';
 import { WebhookNotifier } from './notify/webhook.js';
-import { EmailNotifier } from './notify/email.js';
-import { createUpnpClient, UpnpClient } from '@xmcl/nat-api';
+// import { EmailNotifier } from './notify/email.js';
+import { createUpnpClient, UpnpClient } from '@immjs/nat-api';
 
 const allNotifiers = {
   webhook: WebhookNotifier,
@@ -29,7 +29,7 @@ export class Musician {
     if (this.config.services.some((function (this: Musician, v: z.infer<typeof serviceConfigSchema>) {
       return v.upnp ?? this.config.config.upnp;
     }).bind(this))) {
-      this.upnpClient = createUpnpClient();
+      this.upnpClient = createUpnpClient({ interface: config.config.iface });
       console.log('aaa', this.upnpClient);
       this.upnpClient.then((v) => console.log(v))
     }
