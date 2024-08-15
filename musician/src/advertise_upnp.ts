@@ -1,4 +1,4 @@
-import { NatAPI, upnpNat } from '@achingbrain/nat-port-mapper';
+import { createUpnpClient, UpnpClient } from '@xmcl/nat-api';
 
 interface UPNPAdvertiserOpts {
   description: string;
@@ -6,31 +6,40 @@ interface UPNPAdvertiserOpts {
 }
 
 export class UPNPAdvertiser {
-  client: NatAPI;
+  client: Promise<UpnpClient>;
   options: UPNPAdvertiserOpts;
 
   isUp: boolean = false;
+  keepItAliveInterval: NodeJS.Timeout | undefined;
 
-  constructor (options: UPNPAdvertiserOpts) {
+  constructor (options: UPNPAdvertiserOpts, client: Promise<UpnpClient>) {
     this.options = options;
-    this.client = upnpNat({
-      ttl: 1200,
-      description: this.options.description,
-      keepAlive: true,
-    });
+    console.log(client);
+    this.client = client;
   }
 
   async start() {
-    await this.client.map({
-      localPort: this.options.port,
-      publicPort: this.options.port,
-      protocol: 'TCP',
+    await this.addMap();
+    this.keepItAliveInterval = setInterval(this.addMap.bind(this), 30 * 1000);
+  }
+
+  async addMap() {
+    const client = await this.client;
+    await client.map({
+      public: this.options.port,
+      private: this.options.port,
+      ttl: 60,
+      description: this.options.description,
+      protocol: 'tcp',
     });
     this.isUp = true;
   }
 
   async stop() {
-    await this.client.close();
+    const client = await this.client;
+    await client.unmap({ public: this.options.port });
     this.isUp = false;
+    if (this.keepItAliveInterval) clearInterval(this.keepItAliveInterval);
+    this.keepItAliveInterval = undefined;
   }
 }

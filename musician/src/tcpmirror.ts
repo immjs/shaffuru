@@ -2,6 +2,7 @@ import net from 'net';
 import { UPNPAdvertiser } from './advertise_upnp.js';
 import { z } from 'zod';
 import { serviceConfigSchema } from './config.js';
+import { Musician } from './musician.js';
 
 class SocketWithMetadata {
   lastIncoming: number = -1;
@@ -28,6 +29,7 @@ interface TCPMirrorOpts {
 export class TCPMirror {
   server: net.Server;
   options: TCPMirrorOpts;
+  musician: Musician;
 
   currentSockets: Record<string, SocketWithMetadata> = {};
 
@@ -35,8 +37,9 @@ export class TCPMirror {
 
   upnpAdvertiser?: UPNPAdvertiser;
 
-  constructor (options: TCPMirrorOpts) {
+  constructor (options: TCPMirrorOpts, musician: Musician) {
     this.options = options;
+    this.musician = musician;
 
     this.server = net.createServer((function (this: TCPMirror, localSocket: net.Socket) {
       // Big props to kfox
@@ -48,7 +51,7 @@ export class TCPMirror {
 
       const remoteSocket = new net.Socket();
 
-      remoteSocket.connect({ port: options.port, host: 'localhost' });
+      remoteSocket.connect({ port: options.config.port, host: 'localhost' });
 
       localSocket.on('data', function (data) {
         socketWithMetadata.lastIncoming = Date.now();
@@ -94,7 +97,7 @@ export class TCPMirror {
     this.upnpAdvertiser = new UPNPAdvertiser({
       description: this.options.config.name,
       port: this.options.port,
-    });
+    }, this.musician.upnpClient);
   }
 
   start() {
@@ -126,7 +129,7 @@ export class TCPMirror {
   async stop() {
     if (this.isUp) await this.restrain();
     Object.keys(this.currentSockets)
-      .forEach(this.closeSocket);
+      .forEach(this.closeSocket.bind(this));
   }
 
   closeSocket(socketId: string) {

@@ -10,6 +10,7 @@ export const serviceConfigSchema = z.object({
   name: z.string().min(3).max(64),
   port: z.number(),
   upnp: z.boolean().optional(),
+  notify: z.boolean().optional(),
   disabled: z.boolean()
     .default(false),
   number: z.number().min(0).max(65535)
@@ -17,7 +18,7 @@ export const serviceConfigSchema = z.object({
   range: z.tuple([port, port])
     .default([1, 65535]),
   cron_reload: z.string().refine((v) => cron.validate(v), { message: 'Provided string is not a valid cron expression' })
-    .default('0 0 * * *'),
+    .default('0 * * * *'),
   forced: z.array(z.object({
     port: z.number().min(1).max(65536),
     disabled: z.boolean(),
@@ -25,31 +26,44 @@ export const serviceConfigSchema = z.object({
     .default([]),
 });
 
+export const webhookConfigSchema = z.object({
+  name: z.string().min(3).max(64),
+  type: z.literal('webhook'),
+  url: z.string().url(),
+  data: z.string().optional(),
+  headers: z.record(z.string(), z.string()).default({}),
+});
+
+export const emailConfigSchema = z.object({
+  name: z.string().min(3).max(64),
+  type: z.literal('email'),
+  email: z.string().email(),
+});
+
+export const notifyConfigSchema = z.discriminatedUnion('type', [
+  emailConfigSchema,
+  webhookConfigSchema,
+]);
+
 export const configSchema = z.object({
   config: z.object({
     upnp: z.boolean()
       .default(true),
+    notify: z.boolean()
+      .default(true),
     conductor: z.string().regex(/^wss?:\/\/.+(\:.+)$/)
       .optional(),
-  }),
+  })
+    .default({}),
   trusted_keys: z.array(z.object({
     type: z.string(),
     data: z.string().regex(pemRegex),
-  })),
-  advertising_means: z.array(z.discriminatedUnion('type', [
-    z.object({
-      name: z.string().min(3).max(64),
-      type: z.literal('email'),
-      email: z.string().email(),
-    }),
-    z.object({
-      name: z.string().min(3).max(64),
-      type: z.literal('webhook'),
-      url: z.string().url(),
-      data: z.string(),
-    }),
-  ])),
-  services: z.array(serviceConfigSchema),
+  }))
+    .default([]),
+  notify: notifyConfigSchema.array()
+    .default([]),
+  services: z.array(serviceConfigSchema)
+    .default([]),
 });
 
 export async function readConfig () {
