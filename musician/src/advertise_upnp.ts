@@ -25,6 +25,7 @@ export class UPNPAdvertiser {
 
   async addMap() {
     const client = await this.client;
+    await client.unmap({ public: this.options.port });
     await client.map({
       public: this.options.port,
       private: this.options.port,
