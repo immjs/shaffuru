@@ -23,7 +23,12 @@ export class TCPMirror {
             const socketWithMetadata = new SocketWithMetadata(localSocket);
             this.currentSockets[socketWithMetadata.id] = socketWithMetadata;
             const remoteSocket = new net.Socket();
-            remoteSocket.connect({ port: options.config.port, host: 'localhost' });
+            try {
+                remoteSocket.connect({ port: options.config.port, host: 'localhost' });
+            }
+            catch (e) {
+                return localSocket.destroy();
+            }
             localSocket.on('data', function (data) {
                 socketWithMetadata.lastIncoming = Date.now();
                 if (!remoteSocket.write(data)) {
